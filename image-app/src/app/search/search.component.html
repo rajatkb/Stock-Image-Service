@@ -1,50 +1,53 @@
-<div class="container">
+<div class="container" >
     <div class="search-box">
         <div class="search__container">
             <p class="search__title">
                 Search For Images 
             </p>
-            <input class="search__input" type="text" placeholder="Search" (keyup.enter)="searchEnter($event)">
-            <div class="donut" *ngIf=" spinner$ | async "></div>
+            <input [(ngModel)]="query" class="search__input" type="text" placeholder="Search" (keyup.enter)="searchEnter($event)">
             <br>
             <br>
-            <span>Format: "desc:"Berlin wall" date:20-*-2016 tag:cute,dog ". Use slider to change limit. Current limit :{{ limit }}</span>
+            <span>Scroll for more results , Format: "desc:"Berlin wall" date:20-*-2016 tags:cute,dog ". Use slider to change limit. Current limit :{{ limit }}</span>
             <br>
             <div class="limit">
                 <input [(ngModel)]="limit" type="range"  value="2" max="30"> 
             </div>
         </div>
     </div>
+    
+    
+    <div class="image-view">
+        
+        <ul class="cards" >
+            <li class="cards__item" *ngFor="let upload of uploads$ | async; index as i">
+            <div class="card">
+                <div class="card__image " [ngStyle]="{'background-image' : 'url('+upload.location240 +')' }" ></div>
+                <div class="card__content">
+                <div class="card__title">
+                    <span id="name{{i}}"  >{{ upload.name }}</span>
+                </div>
+                <p class="card__text">
+                    <span class="date">{{ upload.createdAt.getDate()
+                                        +"/"+ (upload.createdAt.getMonth()+1)
+                                        +"/"+upload.createdAt.getFullYear()
+                                        +":"+upload.createdAt.getHours()
+                                        +":"+upload.createdAt.getMinutes()
+                                        +":"+upload.createdAt.getSeconds()
+                                    }}</span>
+                    <br>
+                    <br>
+                    <span class="hashtag" *ngFor="let hashTag of upload.HashTags" >#{{hashTag.tag }}</span>
+                    <br>
+                    {{ upload.description }}
+                </p>
+                </div>
+            </div>
+            </li>
+        </ul>
+        <div class="donut" *ngIf=" spinner$ | async"></div>
+    </div>
 </div>
 
 
 
-<div class="image-view">
-    <ul class="cards" >
-        <li class="cards__item" *ngFor="let upload of uploads$ | async; index as i">
-        <div class="card">
-            <div class="card__image " [ngStyle]="{'background-image' : 'url('+upload.location240 +')' }" ></div>
-            <div class="card__content">
-            <div class="card__title">
-                <span id="name{{i}}"  >{{ upload.name }}</span>
-            </div>
-            <p class="card__text">
-                <span class="date">{{ upload.createdAt.getDate()
-                                    +"/"+ (upload.createdAt.getMonth()+1)
-                                    +"/"+upload.createdAt.getFullYear()
-                                    +":"+upload.createdAt.getHours()
-                                    +":"+upload.createdAt.getMinutes()
-                                    +":"+upload.createdAt.getSeconds()
-                                }}</span>
-                <br>
-                <br>
-                <span class="hashtag" *ngFor="let hashTag of upload.HashTags" >#{{hashTag.tag }}</span>
-                <br>
-                {{ upload.description }}
-            </p>
-            </div>
-        </div>
-        </li>
-    </ul>
-</div>
 

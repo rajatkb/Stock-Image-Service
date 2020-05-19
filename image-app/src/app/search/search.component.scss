@@ -2,8 +2,28 @@
 .container{
     width: 100%;
     padding: 20px 0px;
-
 }
+
+.donut {
+    $bluebell: #979fd0;
+
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 0.3rem solid rgba($bluebell, 0.3);
+    border-top-color: $bluebell;
+    animation: 1.5s spin infinite linear;
+    margin: 50px auto;
+    &.multi {
+      border-bottom-color: $bluebell;
+    }
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
 .search-box{
     width: 100%;
@@ -65,28 +85,13 @@
 
 .image-view{
 
-    $bluebell: #979fd0;
+    
+    min-height: 60vh;
+    margin: 10px 0px;
 
-    .donut {
-        width: 2rem;
-        height: 2rem;
-        margin: 80px auto;
-        border-radius: 50%;
-        border: 0.3rem solid rgba($bluebell, 0.3);
-        border-top-color: $bluebell;
-        animation: 1.5s spin infinite linear;
-      
-        &.multi {
-          border-bottom-color: $bluebell;
-        }
-      }
-      
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
+    margin-bottom: 100px;
 
+    
     $primary: #4DB6AC;
     margin-top: 50px;
     *,
@@ -95,7 +100,7 @@
     box-sizing: border-box;
     }
 
-    margin: 10px 0px;
+   
 
 
     img {

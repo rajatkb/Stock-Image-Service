@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { isNull } from 'util';
 
 type Response = { status:number , message?:string , payload?:any };
 
@@ -13,10 +14,17 @@ export class AuthService {
   constructor(private httpClient:HttpClient) { }
 
   isAuthenticated(){
-    if(sessionStorage.getItem('token') !== undefined)
-      return true
-    else
+    const token = sessionStorage.getItem('token')
+    if( isNull(token))
       return false
+    if( token === undefined)
+      return false
+
+    return true
+  }
+
+  getToken(){
+    return sessionStorage.getItem('token')
   }
 
   async login(username:string , password:string):Promise<boolean>{

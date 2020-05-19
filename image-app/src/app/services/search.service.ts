@@ -34,7 +34,7 @@ export class SearchService {
       offset:0
     }),
     switchMap((value) => {
-      return this.httpClient.get(`${this.baseaddress}/search/images?query="${value.query}"&limit=${value.limit}&offset=${value.offset}`)
+      return this.httpClient.get(`${this.baseaddress}/search/images?query="${value.query} "&limit=${value.limit}&offset=${value.offset}`)
               .pipe(
                 map(val => {
                   val["offset"]= value.offset
@@ -52,6 +52,7 @@ export class SearchService {
       return val
     }),
     scan( (acc , val ) => {
+
       if(val.offset == 0)
         return [].concat(val.payload)
       return acc.concat(val.payload)
