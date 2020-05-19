@@ -51,7 +51,6 @@ export class ImageTransformServer extends ImageSource{
     ){
         super()
 
-        this.logger.info(`Started Image-Transform-Server  process id :${process.pid} at port: ${this.port}`)
         this.server = new ws.Server({
             port:this.port,
             perMessageDeflate: {

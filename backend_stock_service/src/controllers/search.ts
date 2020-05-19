@@ -10,7 +10,7 @@ import { FileS } from "../schema/file";
 import config from 'config'
 import { AuthMiddleWare } from "./middleware/auth";
 
-@controller('/search' , AuthMiddleWare, SearchCacheMiddleware)
+@controller('/search' , AuthMiddleWare ,  SearchCacheMiddleware)
 export class SearchController extends BaseHttpController {
 
     private logger = new Logger(this.constructor.name).getLogger();
@@ -42,6 +42,7 @@ export class SearchController extends BaseHttpController {
             const key = query+"|"+limit+"|"+offset
             const ttl = this.ttl - Math.floor((noffset+1)/(nlimit+1))
             this.cache.set(key , data , ttl)
+            
             response.status(200).json({
                 status:200,
                 payload: data

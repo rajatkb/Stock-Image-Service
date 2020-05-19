@@ -28,7 +28,6 @@ export class UploadController extends BaseHttpController{
         const file:Express.Multer.File = request.file
         const name:string = request.body["name"]
         const desc:string = request.body["description"]
-        console.log(file)
         const tfile = new File(file.originalname , file.encoding , file.mimetype , file.buffer)    
         try{
             let res = await this.uploadService.upload(tfile , name , desc)

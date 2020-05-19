@@ -30,20 +30,21 @@ export class FileOpsModel {
 
         this.fmodel = this.database.getConnection().then(async conn => {
             const model = FileSchema(conn)
-            await model.sync()
+            
+            await model.sync({alter:false})
             return model
         })
 
         this.hmodel = this.database.getConnection().then(async conn => {
             const model = HashTagsSchema(conn)
-            await model.sync()
+            await model.sync({alter:false ,  force:false})
             return model
         })
 
         this.fhmodel = Promise.all([this.fmodel, this.hmodel]).then(() => {
             return this.database.getConnection().then(async conn => {
                 const model = FileHashTagsSchema(conn)
-                await model.sync()
+                await model.sync({alter:false ,  force:false})
                 return model
             })
         })
@@ -166,7 +167,11 @@ export class FileOpsModel {
                 
             }
         
-        return [fwhere , hwhere , fhwhere]
+        
+        const searchOrder = query.desc !== undefined && query.desc !==""?
+                            undefined: [['createdAt','DESC']]
+        
+        return [fwhere , hwhere , fhwhere , searchOrder]
     }
 
     /**
@@ -178,12 +183,12 @@ export class FileOpsModel {
      */
     async findFileByQueryAnd(query: Query , limit:number , offset:number):Promise<FileS[]> {
         
-        const [fwhere,hwhere,fhwhere] = this.buildQuery(query) 
+        const [fwhere,hwhere,fhwhere , searchOrder] = this.buildQuery(query) 
         
         const [fmodel, hmodel, fhmodel] = await this.getAllModel()
         
         const datas = await fmodel.findAll(
-            {
+            {   
                 
                 where: {
                     [Op.and]:fwhere
@@ -201,9 +206,7 @@ export class FileOpsModel {
                         where:fhwhere
                     }
                 ],
-                order: [
-                    ['createdAt', 'DESC']
-                ],
+                order: searchOrder,
                 limit: limit,
                 offset: offset
             }

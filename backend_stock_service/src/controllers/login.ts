@@ -40,7 +40,6 @@ export class LoginController extends BaseHttpController {
         response:Response , 
         next:NextFunction){
             try{
-                console.log(request.body)
                 const user = request.body.username
                 const password = request.body.password
                 if(user === undefined || password === undefined)
@@ -67,6 +66,7 @@ export class LoginController extends BaseHttpController {
                             expiresIn: "2 days",
                             algorithm:"RS256"
                         })
+                        this.logger.info(`logged in new user ip : ${request.ip}`)
                         response.status(200).json({
                             status:200,
                             payload:token

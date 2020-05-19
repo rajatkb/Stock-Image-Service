@@ -1,7 +1,8 @@
 import "reflect-metadata"
 import * as dotenv from 'dotenv-safe';
 import cluster from 'cluster'
-import os from 'os'
+cluster.schedulingPolicy = cluster.SCHED_RR // forcing a round robin , as it greatly enhances the parllel execution
+
 
 dotenv.config({
     example: './.env'
@@ -19,7 +20,7 @@ if(process.env.IMAGE_TF_PROCESS_COUNT === undefined)
 
 let nump = Number.parseInt(process.env.IMAGE_TF_PROCESS_COUNT)
 
-nump = nump !== 0 ? nump : 1
+
 
 
 if(cluster.isMaster){
@@ -28,8 +29,10 @@ if(cluster.isMaster){
        cluster.fork()
     }
 }else {
+
     console.log(`Process at pid : ${process.pid}`)
     let server = container.get(ImageTransformServer)
+
 }
 
 

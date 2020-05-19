@@ -13,7 +13,7 @@ export class QueryBuilder {
     private datePat:RegExp = /date\:(?:(?:([0-9]{1,2})\-([0-9]{1,2})\-([0-9]{4}))|(?:([0-9]{4}))|(?:([0-9]{1,2})\-([0-9]{4})))|date\:(?:(?:([0-9]{1,2}|\*)\-([0-9]{1,2}|\*)\-([0-9]{4}|\*)))\s?/;
     private datePatRangeFrom:RegExp = /from\:(?:([0-9]{1,2})\-([0-9]{1,2})\-([0-9]{4}))\s?/;
     private datePatRangeTo:RegExp = /to\:(?:([0-9]{1,2})\-([0-9]{1,2})\-([0-9]{4}))\s?/
-    private descPat:RegExp = /desc\:(?:\"(.*?)\")|(?:([^\s]*)\s?)/
+    private descPat:RegExp = /desc\:(?:(?:\"(.*?)\")|(?:([a-z0-9A-Z_-]+)))\s/
     
 
     private logger = new Logger(this.constructor.name).getLogger()
@@ -24,8 +24,6 @@ export class QueryBuilder {
 
     constructor(){
         this.logger.info("Query Builder started !!")
- 
-
     }
 
     private parseTags(query:string):string[]{
@@ -43,7 +41,7 @@ export class QueryBuilder {
     }
     
     private parseFromTo(query:string):[Date|undefined , Date|undefined] | undefined {
-        query = " "+query+" "
+        
         const datePatFromRes = this.datePatRangeFrom.exec(query)
         const datePatToRes = this.datePatRangeTo.exec(query)
         if(datePatFromRes == null && datePatToRes == null)
@@ -133,14 +131,24 @@ export class QueryBuilder {
 
 
     private parseDescription(query:string):string | undefined{
+
         const res = this.descPat.exec(query)
-        if(res !== null)
-            if(res[1] !== undefined )
+        console.log(res , query)
+        if(res !== null){
+            if(res[1] !== undefined ){
                 if(res[1].length !== 0)
                     return res[1]
+            }
+            else(res[2] !== undefined)
+            {
+                if(res[2].length !== 0)
+                    return res[2]
+            }
+        }       
     }
 
     public parseQuery(query:string):Query{
+        query = " "+query+" "
         this.logger.debug(`query parser called`)
         let response:Query = {};
         response.tags = this.parseTags(query)

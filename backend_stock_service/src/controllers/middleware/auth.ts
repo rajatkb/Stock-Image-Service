@@ -42,9 +42,6 @@ export class CustomAuthProvider implements interfaces.AuthProvider {
         })
     })
     
-    
-    
-
     public async getUser(
         req:Request, 
         res:Response,
@@ -52,6 +49,7 @@ export class CustomAuthProvider implements interfaces.AuthProvider {
     ): Promise<interfaces.Principal> {
         try{
             const entry:string = req.headers["authorization"] as string
+
             if(entry === undefined){
                 this.logger.warn(`Unauthorized request from ${req.ip}`)
                 return new AdminPrincipal({authenticated:false})
@@ -83,7 +81,6 @@ export class AuthMiddleWare extends BaseMiddleware{
         next: NextFunction
     ){
         let authenticated  = await this.httpContext.user.isAuthenticated()
-        
         if(authenticated)
             next()
         else{

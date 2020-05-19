@@ -24,10 +24,6 @@ const FileSchema = (sequelize:Sequelize) => { FileM.init({
             defaultValue: DataTypes.UUIDV4,
             allowNull:false
         },
-        // date:{
-        //     type:DataTypes.DATEONLY,    
-        // }, 
-        // created by sequelize automatically in createdAt 
         name:{
             type:DataTypes.CHAR(100),
             allowNull:false
@@ -40,28 +36,16 @@ const FileSchema = (sequelize:Sequelize) => { FileM.init({
             type:DataTypes.STRING(200),
             allowNull:false
         },
-        // IF LOCATION DATA IS NEEDED 
-        // location:{
-        //     type:DataTypes.STRING(200),
-        //     allowNull:false
-        // },
-        // location720:{
-        //     type:DataTypes.STRING(200),
-        //     allowNull:false
-        // },
-        // location240:{
-        //     type:DataTypes.STRING(200),
-        //     allowNull:false
-        // }
+
     } , {
         sequelize,
         modelName: 'File',
         indexes: [
             {
                 unique:false,
-                fields:['createdAt']
+                fields:['createdAt'],
             },
-            { type:"FULLTEXT" , fields:["description","name"] },
+            { type:"FULLTEXT" , fields:["description" , "name"] },
         ]
     })
     

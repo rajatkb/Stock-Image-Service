@@ -3,10 +3,10 @@ import { UndefinedEnvironmentVariable, ImageUploadError } from "../../errors/ser
 import path from 'path'
 import { File } from '../../utility/File'
 import { ImageSource } from "./image";
-import {Subject, Observable} from 'rxjs'
+import {Subject, Observable, combineLatest, forkJoin} from 'rxjs'
 import WebSocket from 'ws'
 import { Logger } from "../../utility/logger";
-import {  share , retryWhen , delay } from "rxjs/operators";
+import {  share , retryWhen , delay, last, tap, take, shareReplay } from "rxjs/operators";
 import config from 'config'
 
 
@@ -21,6 +21,8 @@ export class ImageUploadClient extends ImageSource {
     private logger = new Logger(this.constructor.name).getLogger()
 
     private requestTimeout:number = 1000* Number.parseInt(config.get("ImageUploadClient.requestTimeout"))
+
+    
 
     constructor(){
         
@@ -58,27 +60,29 @@ export class ImageUploadClient extends ImageSource {
                 })
 
             }).pipe(
-                retryWhen(error => error.pipe(delay(5000))),
-                share()
+                retryWhen(error => error.pipe(delay(1000))),
             )
         
 
         // initial server connection
         const sub = this.server$.subscribe((socket) => {
             this.logger.info(`Established socket connection !!`)
-            sub.unsubscribe()
         })
         
+        
+
         // setting up request handler
         this.serverEventSource$.subscribe((data) => {
-            const isub = this.server$.subscribe((socket)=> {
-                socket.send(data, (err) => {
-                    if(err !== undefined)
-                        this.logger.error(`failed to send data error: ${err}`)
-                    else{
-                        isub.unsubscribe()
-                    }
-                })
+            const sub = this.server$.subscribe((socket) =>{
+                if(socket.readyState == socket.OPEN)
+                    socket.send(data, (err) => {
+                        if(err !== undefined){
+                            this.logger.error(`failed to send data error: ${err}`)
+                        }
+                        sub.unsubscribe()
+                    })
+                else
+                    sub.unsubscribe()
             })    
         })
         
@@ -92,8 +96,9 @@ export class ImageUploadClient extends ImageSource {
         this.logger.debug(`recieved createFile request for id :${id} and file :${file.filename}`)
         
         const data = File.asMessage(id , file.buffer)
-        this.serverEventSource$.next(data)
+        
         return new Promise((resolve , reject) => {
+
             const sub = this.serverEventSink$.subscribe( data => {
                 if(data == id){
                     this.logger.debug(`file uploaded successfully id : ${id}`)
@@ -101,6 +106,8 @@ export class ImageUploadClient extends ImageSource {
                     resolve(data)
                 }
             })
+            this.serverEventSource$.next(data)
+
             setTimeout(() => {
                 sub.unsubscribe()
                 reject(new ImageUploadError(`took too much time for upload, above ${this.requestTimeout/1000}s`))
