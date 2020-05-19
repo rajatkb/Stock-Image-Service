@@ -1,0 +1,70 @@
+<div class="container">
+    
+    <h1>Upload You File !!</h1>
+
+    <div class="button-container">
+        <div class="hover">
+            <span>{{ uploadStateText }}</span>
+            <input  class="input" 
+                    name="directory" 
+                    type="file" webkitdirectory multiple 
+                    (change)="filesButton($event)" 
+                    #directory style="display: none;">
+            <a class="social-link" (click)="directory.click()">
+                <i class="fa fa-folder"></i>
+            </a>
+
+            <input  class="input" 
+                    name="files" 
+                    type="file" accept="image/*" multiple 
+                    (change)="filesButton($event)" #files 
+                    style="display: none;">
+            <a class="social-link" (click)="files.click()">
+                <i class="fa fa-image"></i>
+            </a>
+        </div>
+    </div>
+    <div class="upload">
+        <a class="bt more-bt" (click)="uploadClick()">
+            <span class="fl"></span><span class="sfl"></span><span class="cross"></span><i></i>
+            <p>Upload</p>
+        </a>
+        
+    </div>
+
+    <p class="message" [ngClass] ="{ 'success-color': uploadSuccess  , 'fail-color':uploadFail}" >{{ uploadmessage}}</p>
+
+    <div class="progressbar" *ngIf="progressBarPercentage !== 0">
+        <div class="progress-bar">
+            <span class="bar">
+                <span class="progress" [ngStyle]="{'width' :  progressBarPercentage+'%' }"></span>
+            </span>
+        </div>
+    </div>
+
+    <div class="image-view">
+        <ul class="cards" >
+            <li class="cards__item" *ngFor="let upload of uploads; index as i">
+            <div class="card">
+                <i class="fa fa-times-circle" (click)="removePhoto(i)"></i>
+                <div class="card__image " [ngStyle]="{'background-image' : 'url('+upload.fileString+')' }" ></div>
+                <div class="card__content">
+                <div class="card__title">
+                    <input id="name{{i}}" name="name{{i}}" type="text" placeholder="{{ upload.name }}" [(ngModel)] = "upload.name">
+                </div>
+                <span class="warning-text" *ngIf="upload.name.length === 0">
+                    name cannot be empty
+                </span>
+                <p class="card__text"><textarea name="description{{i}}" id="description{{i}}" cols="35" rows="3" [(ngModel)] = "upload.description"></textarea></p>
+                </div>
+            </div>
+            </li>
+        </ul>
+    </div>
+
+
+    
+</div>
+
+
+

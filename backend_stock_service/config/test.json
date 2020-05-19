@@ -1,0 +1,18 @@
+{
+    "QueryBuilder":{
+        "timeout":2
+    },
+    "ImageUploadClient":{
+        "requestTimeout":5
+    },
+    "SearchController":{
+        "ttl":30
+    },
+    "CacheService":{
+        "ttl":100
+    },
+    "AuthService":{
+        "privatekey":"keys",
+        "publickey":"keys.pem"
+    }
+}

@@ -1,0 +1,12 @@
+<div class="container">
+    <form  class="login" (submit)="submitHandler()" >
+        <input type="text" #username="ngModel" [(ngModel)]="user.username" name="username" required  placeholder="Username">
+        <span style="color: red;" *ngIf="username.touched && username.invalid"  >Invalid username</span>
+        <input type="password"  #password="ngModel"  [(ngModel)]="user.password" name="password" required    placeholder="Password">
+        <span style="color: red;" *ngIf="password.touched && password.invalid"  >Invalid Password</span>
+        <br>
+        <button type="submit" [disabled]="(password.touched && password.invalid) || (username.touched && username.invalid)" >Login</button>
+    </form>
+</div>
+
+
