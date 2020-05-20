@@ -12,10 +12,6 @@ const FileSchema = (sequelize) => {
             defaultValue: sequelize_1.DataTypes.UUIDV4,
             allowNull: false
         },
-        // date:{
-        //     type:DataTypes.DATEONLY,    
-        // }, 
-        // created by sequelize automatically in createdAt 
         name: {
             type: sequelize_1.DataTypes.CHAR(100),
             allowNull: false
@@ -34,7 +30,7 @@ const FileSchema = (sequelize) => {
         indexes: [
             {
                 unique: false,
-                fields: ['createdAt']
+                fields: ['createdAt'],
             },
             { type: "FULLTEXT", fields: ["description", "name"] },
         ]

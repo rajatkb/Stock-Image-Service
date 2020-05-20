@@ -26,18 +26,18 @@ let FileOpsModel = class FileOpsModel {
         this.logger.info(`File Operations Model started !!`);
         this.fmodel = this.database.getConnection().then(async (conn) => {
             const model = file_1.FileSchema(conn);
-            await model.sync();
+            await model.sync({ alter: false });
             return model;
         });
         this.hmodel = this.database.getConnection().then(async (conn) => {
             const model = hashtags_1.HashTagsSchema(conn);
-            await model.sync();
+            await model.sync({ alter: false, force: false });
             return model;
         });
         this.fhmodel = Promise.all([this.fmodel, this.hmodel]).then(() => {
             return this.database.getConnection().then(async (conn) => {
                 const model = filehashtags_1.FileHashTagsSchema(conn);
-                await model.sync();
+                await model.sync({ alter: false, force: false });
                 return model;
             });
         });
@@ -133,14 +133,15 @@ let FileOpsModel = class FileOpsModel {
             else if (query.dateTime.length == 3) {
                 const arr = ["day", "month", "year"];
                 fwhere = fwhere.concat(query.dateTime.map((val, i) => {
-                    if (val !== undefined && val > 0)
+                    if (val !== undefined)
                         return {
                             attribute: sequelize_1.Sequelize.literal(`${arr[i]}(createdAt) = ${val}`)
                         };
                 }));
-                console.log(fwhere);
             }
-        return [fwhere, hwhere, fhwhere];
+        const searchOrder = query.desc !== undefined && query.desc !== "" ?
+            undefined : [['createdAt', 'DESC']];
+        return [fwhere, hwhere, fhwhere, searchOrder];
     }
     /**
      * Find files by a query of tags , description and date ranges
@@ -150,7 +151,7 @@ let FileOpsModel = class FileOpsModel {
      * @param offset
      */
     async findFileByQueryAnd(query, limit, offset) {
-        const [fwhere, hwhere, fhwhere] = this.buildQuery(query);
+        const [fwhere, hwhere, fhwhere, searchOrder] = this.buildQuery(query);
         const [fmodel, hmodel, fhmodel] = await this.getAllModel();
         const datas = await fmodel.findAll({
             where: {
@@ -167,9 +168,7 @@ let FileOpsModel = class FileOpsModel {
                     where: fhwhere
                 }
             ],
-            order: [
-                ['createdAt', 'DESC']
-            ],
+            order: searchOrder,
             limit: limit,
             offset: offset
         });

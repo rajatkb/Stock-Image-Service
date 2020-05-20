@@ -24,3 +24,11 @@ class UploadError extends Error {
     }
 }
 exports.UploadError = UploadError;
+class AuthenticationError extends Error {
+    constructor(message) {
+        super(message);
+        Object.setPrototypeOf(this, AuthenticationError.prototype);
+        this.name = this.constructor.name;
+    }
+}
+exports.AuthenticationError = AuthenticationError;

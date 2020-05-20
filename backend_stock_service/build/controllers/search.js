@@ -22,6 +22,7 @@ const database_1 = require("../errors/database");
 const cache_1 = require("./middleware/cache");
 const cache_service_1 = require("../services/cache-service");
 const config_1 = __importDefault(require("config"));
+const auth_1 = require("./middleware/auth");
 let SearchController = class SearchController extends inversify_express_utils_1.BaseHttpController {
     constructor(searchService, cache) {
         super();
@@ -29,9 +30,6 @@ let SearchController = class SearchController extends inversify_express_utils_1.
         this.cache = cache;
         this.logger = new logger_1.Logger(this.constructor.name).getLogger();
         this.ttl = Number.parseInt(config_1.default.get('SearchController.ttl'));
-    }
-    async test(req, res) {
-        return "hello";
     }
     async default(query, limit, offset, request, response, next) {
         this.logger.info(`search request from ip : ${request.ip}`);
@@ -64,12 +62,6 @@ let SearchController = class SearchController extends inversify_express_utils_1.
     }
 };
 __decorate([
-    inversify_express_utils_1.httpGet(''),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", Promise)
-], SearchController.prototype, "test", null);
-__decorate([
     inversify_express_utils_1.httpGet('/images'),
     __param(0, inversify_express_utils_1.queryParam("query")),
     __param(1, inversify_express_utils_1.queryParam("limit")),
@@ -79,7 +71,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SearchController.prototype, "default", null);
 SearchController = __decorate([
-    inversify_express_utils_1.controller('/search', cache_1.SearchCacheMiddleware),
+    inversify_express_utils_1.controller('/search', auth_1.AuthMiddleWare, cache_1.SearchCacheMiddleware),
     __metadata("design:paramtypes", [search_service_1.SearchService, cache_service_1.CacheService])
 ], SearchController);
 exports.SearchController = SearchController;

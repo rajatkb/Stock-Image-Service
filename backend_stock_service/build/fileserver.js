@@ -30,7 +30,7 @@ app.use(cors_1.default());
 app.set('etag', false);
 // for security purposes
 app.use(helmet_1.default());
-// app.use('/uploads', express.static(uploads))
+app.use('/uploads', express_1.default.static(uploads));
 app.get("*", (req, res) => {
     res.status(400).json({
         status: 400,

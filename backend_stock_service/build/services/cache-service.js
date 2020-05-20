@@ -15,9 +15,7 @@ const config_1 = __importDefault(require("config"));
 let CacheService = class CacheService {
     constructor() {
         this.stdttl = Number.parseInt(config_1.default.get("CacheService.ttl"));
-        this.nodecache = new node_cache_1.default({
-            stdTTL: this.stdttl
-        });
+        this.nodecache = new node_cache_1.default();
     }
     set(key, value, ttl) {
         this.nodecache.set(key, value, ttl);

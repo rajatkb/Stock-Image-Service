@@ -39,7 +39,7 @@ let ImageHashTags = class ImageHashTags {
         return a;
     }
     getHashTags() {
-        const count = Math.floor(Math.random() * (this.hashtags.length));
+        const count = Math.floor(Math.random() * (5));
         const a = this.shuffle(this.hashtags);
         return a.slice(0, count);
     }

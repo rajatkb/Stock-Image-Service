@@ -16,6 +16,7 @@ const upload_service_1 = require("../services/upload-service");
 const search_service_1 = require("../services/search-service");
 const File_1 = require("../utility/File");
 const image_client_1 = require("../services/image-upload/image-client");
+const auth_1 = require("./middleware/auth");
 let UploadController = class UploadController extends inversify_express_utils_1.BaseHttpController {
     constructor(uploadService, searchService, imageUploadClient) {
         super();
@@ -29,7 +30,6 @@ let UploadController = class UploadController extends inversify_express_utils_1.
         const file = request.file;
         const name = request.body["name"];
         const desc = request.body["description"];
-        console.log(file);
         const tfile = new File_1.File(file.originalname, file.encoding, file.mimetype, file.buffer);
         try {
             let res = await this.uploadService.upload(tfile, name, desc);
@@ -54,7 +54,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UploadController.prototype, "default", null);
 UploadController = __decorate([
-    inversify_express_utils_1.controller('/upload', multer_1.MulterMiddleWare),
+    inversify_express_utils_1.controller('/upload', auth_1.AuthMiddleWare, multer_1.MulterMiddleWare),
     __metadata("design:paramtypes", [upload_service_1.UploadService,
         search_service_1.SearchService,
         image_client_1.ImageUploadClient])

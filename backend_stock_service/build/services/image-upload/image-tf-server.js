@@ -48,7 +48,6 @@ let ImageTransformServer = class ImageTransformServer extends image_1.ImageSourc
         super();
         this.imagePipe = imagePipe;
         this.logger = new logger_1.Logger('Image-Transform-Server').getLogger();
-        this.logger.info(`Started Image-Transform-Server  process id :${process.pid} at port: ${this.port}`);
         this.server = new ws_1.default.Server({
             port: this.port,
             perMessageDeflate: {

@@ -18,11 +18,11 @@ const logger_1 = require("../utility/logger");
 const config_1 = __importDefault(require("config"));
 let QueryBuilder = class QueryBuilder {
     constructor() {
-        this.tagPat = /(?:tags\:((?:[a-z0-9A-Z_-]+)(?:\,[a-z0-9A-Z_-]+)*))\s/;
-        this.datePat = /date\:(?:(?:([0-9]{1,2})\-([0-9]{1,2})\-([0-9]{4}))|(?:([0-9]{4}))|(?:([0-9]{1,2})\-([0-9]{4})))|date\:(?:(?:([0-9]{1,2}|\*)\-([0-9]{1,2}|\*)\-([0-9]{4}|\*)))/;
-        this.datePatRangeFrom = /from\:(?:([0-9]{1,2})\-([0-9]{1,2})\-([0-9]{4}))\s/;
-        this.datePatRangeTo = /to\:(?:([0-9]{1,2})\-([0-9]{1,2})\-([0-9]{4}))\s/;
-        this.descPat = /desc\:(?:\"(.*?)\")|(?:([^\s]*)\s)/;
+        this.tagPat = /(?:tags\:((?:[a-z0-9A-Z_-]+)(?:\,[a-z0-9A-Z_-]+)*))\s?/;
+        this.datePat = /date\:(?:(?:([0-9]{1,2})\-([0-9]{1,2})\-([0-9]{4}))|(?:([0-9]{4}))|(?:([0-9]{1,2})\-([0-9]{4})))|date\:(?:(?:([0-9]{1,2}|\*)\-([0-9]{1,2}|\*)\-([0-9]{4}|\*)))\s?/;
+        this.datePatRangeFrom = /from\:(?:([0-9]{1,2})\-([0-9]{1,2})\-([0-9]{4}))\s?/;
+        this.datePatRangeTo = /to\:(?:([0-9]{1,2})\-([0-9]{1,2})\-([0-9]{4}))\s?/;
+        this.descPat = /desc\:(?:(?:\"(.*?)\")|(?:([a-z0-9A-Z_-]+)))\s/;
         this.logger = new logger_1.Logger(this.constructor.name).getLogger();
         this.timeout = Number.parseInt(config_1.default.get('QueryBuilder.timeout')) * 1000;
         this.getInitDate = (str) => {
@@ -47,7 +47,6 @@ let QueryBuilder = class QueryBuilder {
             return [];
     }
     parseFromTo(query) {
-        query = query + " ";
         const datePatFromRes = this.datePatRangeFrom.exec(query);
         const datePatToRes = this.datePatRangeTo.exec(query);
         if (datePatFromRes == null && datePatToRes == null)
@@ -133,12 +132,22 @@ let QueryBuilder = class QueryBuilder {
     }
     parseDescription(query) {
         const res = this.descPat.exec(query);
-        if (res !== null)
-            if (res[1] !== undefined)
+        console.log(res, query);
+        if (res !== null) {
+            if (res[1] !== undefined) {
                 if (res[1].length !== 0)
                     return res[1];
+            }
+            else
+                (res[2] !== undefined);
+            {
+                if (res[2].length !== 0)
+                    return res[2];
+            }
+        }
     }
     parseQuery(query) {
+        query = " " + query + " ";
         this.logger.debug(`query parser called`);
         let response = {};
         response.tags = this.parseTags(query);

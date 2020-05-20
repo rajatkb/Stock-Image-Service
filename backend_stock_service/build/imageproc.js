@@ -13,6 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const dotenv = __importStar(require("dotenv-safe"));
 const cluster_1 = __importDefault(require("cluster"));
+cluster_1.default.schedulingPolicy = cluster_1.default.SCHED_RR; // forcing a round robin , as it greatly enhances the parllel execution
 dotenv.config({
     example: './.env'
 });
@@ -22,7 +23,6 @@ const server_1 = require("./errors/server");
 if (process.env.IMAGE_TF_PROCESS_COUNT === undefined)
     throw new server_1.UndefinedEnvironmentVariable("process.env.IMAGE_TF_PROCESS_COUNT : undefined in .env");
 let nump = Number.parseInt(process.env.IMAGE_TF_PROCESS_COUNT);
-nump = nump !== 0 ? nump : 1;
 if (cluster_1.default.isMaster) {
     for (let i = 0; i < nump; i++) {
         cluster_1.default.fork();
