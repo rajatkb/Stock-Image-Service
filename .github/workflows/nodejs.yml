@@ -27,7 +27,7 @@ jobs:
       uses: actions/cache@v1.2.0
       with:
         key: modules
-        path: node_modules
+        path: ./backend_stock_service/node_modules
     - run: npm install
     - run: npm run build --if-present
 
@@ -51,7 +51,7 @@ jobs:
       uses: actions/cache@v1.2.0
       with:
         key: modules
-        path: node_modules
+        path: ./image-app/node_modules
     - run: npm install
     - run: npm run build --if-present
 
