@@ -14,8 +14,13 @@ if(process.env.FILE_SERVER_PORT === undefined )
 if(process.env.STORAGE_LOCATION === undefined )
     throw new UndefinedEnvironmentVariable(`STORAGE_LOCATION not defined`)
 
+if(process.env.APPLICATION_LOCATION === undefined )
+    throw new UndefinedEnvironmentVariable(`APPLICATION_LOCATION not defined`)
+
 const uploads = process.env.STORAGE_LOCATION
 const port  = Number.parseInt(process.env.FILE_SERVER_PORT)
+const application = process.env.APPLICATION_LOCATION
+
 
 const app = express()
 
@@ -26,7 +31,7 @@ app.set('etag' , false)
 app.use(helmet())
 
 app.use('/uploads', express.static(uploads))
-
+app.use(express.static(application))
 app.get("*" , (req , res) => {
     res.status(400).json({
         status:400,
