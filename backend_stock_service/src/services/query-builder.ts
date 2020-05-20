@@ -40,6 +40,7 @@ export class QueryBuilder {
         return begDate
     }
     
+    
     private parseFromTo(query:string):[Date|undefined , Date|undefined] | undefined {
         
         const datePatFromRes = this.datePatRangeFrom.exec(query)
