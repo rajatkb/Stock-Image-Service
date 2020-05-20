@@ -23,6 +23,11 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - name: Cache
+      uses: actions/cache@v1.2.0
+      with:
+        key: modules
+        path: node_modules
     - run: npm install
     - run: npm run build --if-present
 
@@ -42,6 +47,11 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - name: Cache
+      uses: actions/cache@v1.2.0
+      with:
+        key: modules
+        path: node_modules
     - run: npm install
     - run: npm run build --if-present
 
