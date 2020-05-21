@@ -15,7 +15,8 @@ export class LoginController extends BaseHttpController {
     
     private privateKey =  config.get('AuthService.privatekey') as string 
     private logger = new Logger(this.constructor.name).getLogger();
-    constructor(private cacheService:CacheService<Buffer>){
+    constructor(private cacheService:CacheService<Buffer>
+        ){
         super()
         if(process.env.ADMIN_PASSWORD === undefined)
             throw new UndefinedEnvironmentVariable(`ADMIN_PASSWORD not defined`)

@@ -20,6 +20,7 @@ const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const prettyjson_1 = __importDefault(require("prettyjson"));
 const cluster_1 = __importDefault(require("cluster"));
+const http_1 = __importDefault(require("http"));
 dotenv.config({
     example: './.env'
 });
@@ -64,8 +65,10 @@ else {
     let app = server.build();
     let routerInfo = inversify_express_utils_1.getRouteInfo(api_config_1.container);
     logger.info(" Router Info !! \n\n" + prettyjson_1.default.render(routerInfo) + " \n\n");
-    app.listen(process.env.SERVER_PORT, () => {
-        logger.info(`Server started at ${process.env.SERVER_PORT}`);
+    process.env.SERVER_PORT;
+    const httpServer = http_1.default.createServer(app);
+    httpServer.listen(80, () => {
+        logger.info(`Server started at ${80}`);
     });
     process.on("SIGINT", () => {
         database.close();

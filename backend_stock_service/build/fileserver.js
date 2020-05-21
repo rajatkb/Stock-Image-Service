@@ -22,8 +22,11 @@ if (process.env.FILE_SERVER_PORT === undefined)
     throw new server_1.UndefinedEnvironmentVariable(`FILE_SERVER_PORT not defined`);
 if (process.env.STORAGE_LOCATION === undefined)
     throw new server_1.UndefinedEnvironmentVariable(`STORAGE_LOCATION not defined`);
+if (process.env.APPLICATION_LOCATION === undefined)
+    throw new server_1.UndefinedEnvironmentVariable(`APPLICATION_LOCATION not defined`);
 const uploads = process.env.STORAGE_LOCATION;
 const port = Number.parseInt(process.env.FILE_SERVER_PORT);
+const application = process.env.APPLICATION_LOCATION;
 const app = express_1.default();
 app.use(cors_1.default());
 // disabled compression control calculations
@@ -31,6 +34,7 @@ app.set('etag', false);
 // for security purposes
 app.use(helmet_1.default());
 app.use('/uploads', express_1.default.static(uploads));
+app.use(express_1.default.static(application));
 app.get("*", (req, res) => {
     res.status(400).json({
         status: 400,
