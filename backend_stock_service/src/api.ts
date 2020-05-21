@@ -62,6 +62,8 @@ if(cluster.isMaster){
 
     server.setConfig((app) => {
         // disabled compression control calculations
+        app.use()
+
         app.set('etag' , false)
         // for security purposes
         app.use(helmet())
