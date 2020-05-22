@@ -134,7 +134,6 @@ export class QueryBuilder {
     private parseDescription(query:string):string | undefined{
 
         const res = this.descPat.exec(query)
-        console.log(res , query)
         if(res !== null){
             if(res[1] !== undefined ){
                 if(res[1].length !== 0)
