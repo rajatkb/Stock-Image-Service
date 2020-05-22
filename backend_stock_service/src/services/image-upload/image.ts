@@ -10,6 +10,7 @@ export abstract class ImageSource{
 
     protected readonly port:number
     protected readonly host:string
+    protected readonly tfservercount:number
 
     constructor(){
         if(process.env.STORAGE_LOCATION === undefined)
@@ -24,7 +25,12 @@ export abstract class ImageSource{
         if(isNaN(this.port))
             throw new UndefinedEnvironmentVariable('IMAGE_TRANSFORM_SERVER_PORT is not a number')
         this.host = process.env.IMAGE_TRANSFORM_SERVER_HOST
-
+        
+        if(process.env.IMAGE_TF_PROCESS_COUNT === undefined)
+            throw new UndefinedEnvironmentVariable('IMAGE_TF_PROCESS_COUNT is not defined')
+        this.tfservercount = Number.parseInt(process.env.IMAGE_TF_PROCESS_COUNT)
+        if(isNaN(this.tfservercount))
+            throw new UndefinedEnvironmentVariable('IMAGE_TF_PROCESS_COUNT is not a number')
     }
 
     public getPrimaryLocation = () => this.root

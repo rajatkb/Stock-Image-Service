@@ -6,7 +6,7 @@ import { ImageSource } from "./image";
 import {Subject, Observable, combineLatest, forkJoin, Subscriber, interval} from 'rxjs'
 import WebSocket from 'ws'
 import { Logger } from "../../utility/logger";
-import {  share , retryWhen , delay, last, tap, take, shareReplay, retry, catchError } from "rxjs/operators";
+import {  share , retryWhen , delay, last, tap, take, shareReplay, retry, catchError, map, mergeMap, switchMap } from "rxjs/operators";
 import config from 'config'
 
 
@@ -18,7 +18,7 @@ export class ImageUploadClient extends ImageSource {
     private readonly serverEventSink$ = new Subject<WebSocket.Data>()
     private readonly server$:Observable<WebSocket>; 
 
-    private sendDate2Server = (data:Buffer) => {
+    private sendData2Server = (data:Buffer) => {
         this.serverEventSource$.next(data)
         this.serverEventSource$.next(undefined)
     }
@@ -57,6 +57,15 @@ export class ImageUploadClient extends ImageSource {
 
     }
 
+
+    private getSocketObs = () => new Observable<WebSocket>((subscribe) => {
+        let websocket = this.setupSocket(subscribe)
+        const interval = setInterval(() => {
+           if(websocket.readyState !== websocket.OPEN)
+                websocket = this.setupSocket(subscribe) 
+        } , 10000)          
+    })
+
     constructor(){
         
 
@@ -65,15 +74,25 @@ export class ImageUploadClient extends ImageSource {
         this.logger.info(`Started Image Upload Client`)
         this.logger.debug(`trying to connected at ws://${this.host}:${this.port}`)
 
-        this.server$ = new Observable<WebSocket>((subscribe) => {
-            let websocket = this.setupSocket(subscribe)
-            const interval = setInterval(() => {
-               if(websocket.readyState !== websocket.OPEN)
-                    websocket = this.setupSocket(subscribe) 
-            } , 10000)          
-        })
+        
+        this.server$ = combineLatest(
+                            Array.from(
+                                Array(this.tfservercount),
+                                () => this.getSocketObs()
+                            )).pipe(
+                                switchMap( v => {
+                                    return interval(500).pipe(
+                                        map(num => {
+                                            (v[num%v.length] as any).id = num%v.length
+                                            return v[num%v.length]
+                                        })
+                                    )
+                                })
+                            )
+        
         
         this.serverEventSource$.next(undefined)
+
 
         const sub = combineLatest([this.serverEventSource$ , this.server$]).subscribe(([data , socket]) => {            
             if(data !== undefined)
@@ -81,6 +100,7 @@ export class ImageUploadClient extends ImageSource {
                     if(err !== undefined){
                         this.logger.error(`failed to send data error: ${err}`)
                     }
+                    this.logger.info(`Send data using Socket connection number : ${(socket as any).id}`)
                 })
         })
 
@@ -108,7 +128,7 @@ export class ImageUploadClient extends ImageSource {
                     resolve(data)
                 }
             })
-            this.sendDate2Server // to stop restarts sending in duplicate data
+            this.sendData2Server(data) // to stop restarts sending in duplicate data
             setTimeout(() => {
                 sub.unsubscribe()
                 reject(new ImageUploadError(`took too much time for upload, above ${this.requestTimeout/1000}s`))
