@@ -107,3 +107,9 @@ dist
 # uploads folder
 
 **/uploads
+
+# keys
+
+**/keys
+**/keys.pem
+**/keys.pub
