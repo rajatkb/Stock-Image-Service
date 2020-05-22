@@ -28,14 +28,9 @@ let ImageUploadClient = class ImageUploadClient extends image_1.ImageSource {
         this.serverEventSink$ = new rxjs_1.Subject();
         this.logger = new logger_1.Logger(this.constructor.name).getLogger();
         this.requestTimeout = 1000 * Number.parseInt(config_1.default.get("ImageUploadClient.requestTimeout"));
-        this.logger.info(`Started Image Upload Client`);
-        this.logger.debug(`trying to connected at ws://${this.host}:${this.port}`);
-        this.server$ = new rxjs_1.Observable((subscribe) => {
-            this.logger.warn(`trying to connect to server`);
-            let websocket = new ws_1.default(`ws://${this.host}:${this.port}`);
+        this.setupSocket = (websocket, subscribe) => {
             websocket.on("error", (err) => {
                 this.logger.error(`could not connect to image processing serevr error :${err}`);
-                subscribe.error(err);
                 websocket.terminate();
                 websocket.close();
             });
@@ -51,24 +46,22 @@ let ImageUploadClient = class ImageUploadClient extends image_1.ImageSource {
             websocket.on("message", (data) => {
                 this.serverEventSink$.next(data);
             });
-        }).pipe(operators_1.retryWhen(error => error.pipe(operators_1.delay(1000))), operators_1.share());
-        // initial server connection
-        const sub = this.server$.subscribe((socket) => {
-            this.logger.info(`Established socket connection !!`);
-        });
-        // setting up request handler
-        this.serverEventSource$.subscribe((data) => {
-            const sub = this.server$.subscribe((socket) => {
-                if (socket.readyState == socket.OPEN)
-                    socket.send(data, (err) => {
-                        if (err !== undefined) {
-                            this.logger.error(`failed to send data error: ${err}`);
-                        }
-                        sub.unsubscribe();
-                    });
-                else
-                    sub.unsubscribe();
-            });
+        };
+        this.logger.info(`Started Image Upload Client`);
+        this.logger.debug(`trying to connected at ws://${this.host}:${this.port}`);
+        this.server$ = new rxjs_1.Observable((subscribe) => {
+            let websocket;
+            this.logger.warn(`trying to connect to server`);
+            websocket = new ws_1.default(`ws://${this.host}:${this.port}`);
+            this.setupSocket(websocket, subscribe);
+        }).pipe(operators_1.share());
+        const sub = rxjs_1.combineLatest([this.serverEventSource$, this.server$]).subscribe(([data, socket]) => {
+            if (data !== undefined)
+                socket.send(data, (err) => {
+                    if (err !== undefined) {
+                        this.logger.error(`failed to send data error: ${err}`);
+                    }
+                });
         });
     }
     async createFile(id, file) {
@@ -83,6 +76,7 @@ let ImageUploadClient = class ImageUploadClient extends image_1.ImageSource {
                 }
             });
             this.serverEventSource$.next(data);
+            this.serverEventSource$.next(undefined);
             setTimeout(() => {
                 sub.unsubscribe();
                 reject(new server_1.ImageUploadError(`took too much time for upload, above ${this.requestTimeout / 1000}s`));
