@@ -22,6 +22,7 @@ const HashTagsSchema = (sequelize:Sequelize) => { HashTagsM.init({
         type:DataTypes.CHAR(100),
         unique:true,
         allowNull:false,
+        primaryKey:true
     },
 } , {
     sequelize,
