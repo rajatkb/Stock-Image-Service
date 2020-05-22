@@ -138,6 +138,9 @@ Which organises all this for query through sequelize.
 
 * When using Caching for single query 
 
+Autocannon benchmark for 100 concurrent with 10000 request to search service.
+The performance is better for lesser concurrency and higher LIBUV_THREADPOOL count
+
 ┌─────────┬────────┬────────┬────────┬────────┬───────────┬───────────┬────────────┐
 │ Stat    │ 2.5%   │ 50%    │ 97.5%  │ 99%    │ Avg       │ Stdev     │ Max        │
 ├─────────┼────────┼────────┼────────┼────────┼───────────┼───────────┼────────────┤
@@ -152,3 +155,10 @@ Which organises all this for query through sequelize.
 └───────────┴─────────┴─────────┴────────┴─────────┴────────┴────────┴─────────┘
 
 Req/Bytes counts sampled once per second.
+
+## Resilience 
+
+* The application `api` and `imageproc` are sepparate. The `api` when started tries to connect to the api automatically. If the service of `imageproc` fails. Even then the `api` quickly tries to recreate the connection.
+
+* `api` also hosts a pool of connection to several connection to the subprocess of `imageproc` so that it can distribute the request among them in a uniform fashion.
+
