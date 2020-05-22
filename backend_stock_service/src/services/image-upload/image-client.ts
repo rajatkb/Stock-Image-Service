@@ -61,6 +61,7 @@ export class ImageUploadClient extends ImageSource {
 
             }).pipe(
                 retryWhen(error => error.pipe(delay(1000))),
+                share()
             )
         
 
@@ -72,6 +73,7 @@ export class ImageUploadClient extends ImageSource {
         
 
         // setting up request handler
+        // can be done using a forkJoin
         this.serverEventSource$.subscribe((data) => {
             const sub = this.server$.subscribe((socket) =>{
                 if(socket.readyState == socket.OPEN)

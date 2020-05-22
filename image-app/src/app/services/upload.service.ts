@@ -3,15 +3,16 @@ import { UploadData, UploadStatus } from '../schema/upload';
 import { HttpClient, HttpEventType, HttpEvent, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable , merge, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators'
+import { ConstantService } from './constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UploadService {
 
-  private baseaddress = "http://localhost:3000"
+  private baseaddress = this.constants.apibase
 
-  constructor(private httpClient:HttpClient) { }
+  constructor(private httpClient:HttpClient , private constants:ConstantService) { }
 
   private traceProgress(data:UploadData, index:number , length:number){
     let progress = 0;

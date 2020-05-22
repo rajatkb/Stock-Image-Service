@@ -51,7 +51,7 @@ let ImageUploadClient = class ImageUploadClient extends image_1.ImageSource {
             websocket.on("message", (data) => {
                 this.serverEventSink$.next(data);
             });
-        }).pipe(operators_1.retryWhen(error => error.pipe(operators_1.delay(1000))));
+        }).pipe(operators_1.retryWhen(error => error.pipe(operators_1.delay(1000))), operators_1.share());
         // initial server connection
         const sub = this.server$.subscribe((socket) => {
             this.logger.info(`Established socket connection !!`);

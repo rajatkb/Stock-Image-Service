@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { isNull } from 'util';
+import { ConstantService } from './constants';
 
 type Response = { status:number , message?:string , payload?:any };
 
@@ -9,9 +10,9 @@ type Response = { status:number , message?:string , payload?:any };
 })
 export class AuthService {
 
-  private baseaddress = "http://localhost:3000"
+  private baseaddress = this.constants.apibase
 
-  constructor(private httpClient:HttpClient) { }
+  constructor(private httpClient:HttpClient , private constants:ConstantService) { }
 
   isAuthenticated(){
     const token = sessionStorage.getItem('token')

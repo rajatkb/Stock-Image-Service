@@ -15,6 +15,7 @@ import { LoginComponent } from './login/login.component';
 import { AuthService } from './services/auth.service';
 import { RoutesGuard } from './auth/routes.guard';
 import { TokenInterceptorService } from './services/token-interceptor.service';
+import { ConstantService } from './services/constants';
 
 
 
@@ -42,6 +43,7 @@ import { TokenInterceptorService } from './services/token-interceptor.service';
     SearchService,
     AuthService,
     RoutesGuard,
+    ConstantService,
     { provide: 'Window',  useValue: window }
     
   ],

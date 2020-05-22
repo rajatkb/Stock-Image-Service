@@ -3,6 +3,7 @@ import {Observable, Subject, from, of} from 'rxjs'
 import { HttpClient } from '@angular/common/http';
 import { scan, switchMap, map, filter } from 'rxjs/operators';
 import { FileS } from '../schema/file';
+import { ConstantService } from './constants';
 
 type QueryData = { query:string , limit:number , offset?:number};
 type Response = { offset:number , status:number , message?:string , payload?:any };
@@ -11,9 +12,11 @@ type Response = { offset:number , status:number , message?:string , payload?:any
   providedIn: 'root'
 })
 export class SearchService {
+  
+  constructor(private httpClient:HttpClient , private constants:ConstantService) { }
 
-  private baseaddress = "http://localhost:3000"
-  private baseImageAddress = "http://localhost:3100"
+  private baseaddress = this.constants.apibase
+  private baseImageAddress = this.constants.filserver
 
   private searchRequest$ = new Subject<QueryData>()
 
@@ -60,7 +63,7 @@ export class SearchService {
   )
   
 
-  constructor(private httpClient:HttpClient) { }
+  
 
   search(query:string , limit:number){
     this.searchRequest$.next({
