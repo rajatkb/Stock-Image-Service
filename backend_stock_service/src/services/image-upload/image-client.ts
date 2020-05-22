@@ -3,10 +3,10 @@ import { UndefinedEnvironmentVariable, ImageUploadError } from "../../errors/ser
 import path from 'path'
 import { File } from '../../utility/File'
 import { ImageSource } from "./image";
-import {Subject, Observable, combineLatest, forkJoin, Subscriber} from 'rxjs'
+import {Subject, Observable, combineLatest, forkJoin, Subscriber, interval} from 'rxjs'
 import WebSocket from 'ws'
 import { Logger } from "../../utility/logger";
-import {  share , retryWhen , delay, last, tap, take, shareReplay } from "rxjs/operators";
+import {  share , retryWhen , delay, last, tap, take, shareReplay, retry, catchError } from "rxjs/operators";
 import config from 'config'
 
 
@@ -18,11 +18,20 @@ export class ImageUploadClient extends ImageSource {
     private readonly serverEventSink$ = new Subject<WebSocket.Data>()
     private readonly server$:Observable<WebSocket>; 
 
+    private sendDate2Server = (data:Buffer) => {
+        this.serverEventSource$.next(data)
+        this.serverEventSource$.next(undefined)
+    }
+
     private logger = new Logger(this.constructor.name).getLogger()
 
     private requestTimeout:number = 1000* Number.parseInt(config.get("ImageUploadClient.requestTimeout"))
 
-    private setupSocket = (websocket:WebSocket , subscribe:Subscriber<WebSocket>) => {
+    private setupSocket = (subscribe:Subscriber<WebSocket>) => {
+        let websocket:WebSocket 
+        this.logger.warn(`trying to connect to server`)
+        websocket = new WebSocket(`ws://${this.host}:${this.port}`)
+            
         websocket.on("error" , (err) => {
             this.logger.error(`could not connect to image processing serevr error :${err}`)
             websocket.terminate()
@@ -44,6 +53,8 @@ export class ImageUploadClient extends ImageSource {
             this.serverEventSink$.next(data)
         })
 
+        return websocket
+
     }
 
     constructor(){
@@ -55,15 +66,15 @@ export class ImageUploadClient extends ImageSource {
         this.logger.debug(`trying to connected at ws://${this.host}:${this.port}`)
 
         this.server$ = new Observable<WebSocket>((subscribe) => {
-            let websocket:WebSocket | undefined
-            this.logger.warn(`trying to connect to server`)
-            websocket = new WebSocket(`ws://${this.host}:${this.port}`)
-            this.setupSocket(websocket , subscribe)
-            }).pipe(
-                share()
-            )
+            let websocket = this.setupSocket(subscribe)
+            const interval = setInterval(() => {
+               if(websocket.readyState !== websocket.OPEN)
+                    websocket = this.setupSocket(subscribe) 
+            } , 10000)          
+        })
         
- 
+        this.serverEventSource$.next(undefined)
+
         const sub = combineLatest([this.serverEventSource$ , this.server$]).subscribe(([data , socket]) => {            
             if(data !== undefined)
                 socket.send(data , (err) => {
@@ -72,6 +83,8 @@ export class ImageUploadClient extends ImageSource {
                     }
                 })
         })
+
+        
 
        
         
@@ -95,9 +108,7 @@ export class ImageUploadClient extends ImageSource {
                     resolve(data)
                 }
             })
-            
-            this.serverEventSource$.next(data)
-            this.serverEventSource$.next(undefined)
+            this.sendDate2Server // to stop restarts sending in duplicate data
             setTimeout(() => {
                 sub.unsubscribe()
                 reject(new ImageUploadError(`took too much time for upload, above ${this.requestTimeout/1000}s`))
