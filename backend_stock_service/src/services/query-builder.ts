@@ -36,7 +36,8 @@ export class QueryBuilder {
 
     private getInitDate = (str:string) => {
         let begDate = new Date(str)
-        begDate.setUTCHours(0, 0 , 0 , 0)
+        let dat = begDate.getDate()
+        begDate.setHours(0, 0 , 0 , 0)
         return begDate
     }
     
@@ -75,6 +76,7 @@ export class QueryBuilder {
 
     private parseDate(query:string):[Date|undefined, Date|undefined]|[number|undefined, number|undefined , number|undefined]|undefined{
         let datePatRes = this.datePat.exec(query)
+        
         if(datePatRes === null)
             return undefined
         try{
@@ -87,6 +89,7 @@ export class QueryBuilder {
                 if(begDate.toString() == 'Invalid Date')
                     throw new IllegalDateFormat(`Bad date format give (d , m , yyyy) : ${`${day}/${month}/${year}`}`)
                 let endDate = new Date(begDate.getTime() + 24*60*60*1000)
+                console.log([begDate , endDate])
                 return [begDate , endDate]
             }else if(datePatRes[4] !== undefined){
                 // single year mode date:2016
@@ -121,6 +124,7 @@ export class QueryBuilder {
                     arr[1] = month
                 if(!isNaN(year))
                     arr[2] = year
+                
                 return arr
             }
 

@@ -137,7 +137,7 @@ export class FileOpsModel {
             hwhere = {
                 tag:query.tags
             }
-        if( query.dateTime !== undefined)
+        if( query.dateTime !== undefined){
             if(query.dateTime.length == 2){
                 if(query.dateTime[0] == undefined && query.dateTime[1] == undefined )
                     fhwhere = undefined 
@@ -153,6 +153,19 @@ export class FileOpsModel {
                             [Op.gte]: query.dateTime[0]
                         }
                     }
+                else if(query.dateTime[0] !== undefined && query.dateTime[1] !== undefined )
+                    fhwhere = {
+                        createdAt:{
+                            [Op.and]:[
+                                {
+                                    [Op.gte]:query.dateTime[0]
+                                },
+                                {
+                                    [Op.lte]:query.dateTime[1]
+                                }
+                            ]
+                        }
+                    }
             }                
             else if(query.dateTime.length == 3){
                 
@@ -166,11 +179,13 @@ export class FileOpsModel {
                 }))
                 
             }
-        
+
+        }
+            
         
         const searchOrder = query.desc !== undefined && query.desc !==""?
                             undefined: [['createdAt','DESC']]
-        
+
         return [fwhere , hwhere , fhwhere , searchOrder]
     }
 

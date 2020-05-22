@@ -26,9 +26,16 @@ let ImageUploadClient = class ImageUploadClient extends image_1.ImageSource {
         super();
         this.serverEventSource$ = new rxjs_1.Subject();
         this.serverEventSink$ = new rxjs_1.Subject();
+        this.sendData2Server = (data) => {
+            this.serverEventSource$.next(data);
+            this.serverEventSource$.next(undefined);
+        };
         this.logger = new logger_1.Logger(this.constructor.name).getLogger();
         this.requestTimeout = 1000 * Number.parseInt(config_1.default.get("ImageUploadClient.requestTimeout"));
-        this.setupSocket = (websocket, subscribe) => {
+        this.setupSocket = (subscribe) => {
+            let websocket;
+            this.logger.warn(`trying to connect to server`);
+            websocket = new ws_1.default(`ws://${this.host}:${this.port}`);
             websocket.on("error", (err) => {
                 this.logger.error(`could not connect to image processing serevr error :${err}`);
                 websocket.terminate();
@@ -46,21 +53,31 @@ let ImageUploadClient = class ImageUploadClient extends image_1.ImageSource {
             websocket.on("message", (data) => {
                 this.serverEventSink$.next(data);
             });
+            return websocket;
         };
+        this.getSocketObs = () => new rxjs_1.Observable((subscribe) => {
+            let websocket = this.setupSocket(subscribe);
+            const interval = setInterval(() => {
+                if (websocket.readyState !== websocket.OPEN)
+                    websocket = this.setupSocket(subscribe);
+            }, 10000);
+        });
         this.logger.info(`Started Image Upload Client`);
         this.logger.debug(`trying to connected at ws://${this.host}:${this.port}`);
-        this.server$ = new rxjs_1.Observable((subscribe) => {
-            let websocket;
-            this.logger.warn(`trying to connect to server`);
-            websocket = new ws_1.default(`ws://${this.host}:${this.port}`);
-            this.setupSocket(websocket, subscribe);
-        }).pipe(operators_1.share());
+        this.server$ = rxjs_1.combineLatest(Array.from(Array(this.tfservercount), () => this.getSocketObs())).pipe(operators_1.switchMap(v => {
+            return rxjs_1.interval(500).pipe(operators_1.map(num => {
+                v[num % v.length].id = num % v.length;
+                return v[num % v.length];
+            }));
+        }));
+        this.serverEventSource$.next(undefined);
         const sub = rxjs_1.combineLatest([this.serverEventSource$, this.server$]).subscribe(([data, socket]) => {
             if (data !== undefined)
                 socket.send(data, (err) => {
                     if (err !== undefined) {
                         this.logger.error(`failed to send data error: ${err}`);
                     }
+                    this.logger.info(`Send data using Socket connection number : ${socket.id}`);
                 });
         });
     }
@@ -75,8 +92,7 @@ let ImageUploadClient = class ImageUploadClient extends image_1.ImageSource {
                     resolve(data);
                 }
             });
-            this.serverEventSource$.next(data);
-            this.serverEventSource$.next(undefined);
+            this.sendData2Server(data); // to stop restarts sending in duplicate data
             setTimeout(() => {
                 sub.unsubscribe();
                 reject(new server_1.ImageUploadError(`took too much time for upload, above ${this.requestTimeout / 1000}s`));
