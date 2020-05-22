@@ -60,8 +60,8 @@ export class ImageUploadClient extends ImageSource {
                 })
 
             }).pipe(
+                share(),
                 retryWhen(error => error.pipe(delay(1000))),
-                share()
             )
         
 
