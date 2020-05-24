@@ -92,12 +92,14 @@ or
 
 * The description also can be used to add extra hashtags e.g `#somethig` , these are then used for searching images by tag
 
+* Each request moves through process of commiting metadata of file to mysql and then submitting it to imageproc, it responds back only when the upload completely finishes. In this way user is assured of successful file upload and saving in the backend. This process can be disentangled and the user can be immdiately responded back as soon as the file blobs are acquired in the backend.
+
 * The images are kept in two versions in the server on in 240p and other in 720p. the process is handled by `imageproc` and is not part of the primary server. Hence crash in either of them will not hinder the processing of new request. Each data commit is given a 5s timeout which is configurable from the config folder. This means if `imageproc` does not respond with affirmation it will be assumed commit did not happen and the MySQL commit done will be reverted back. This is an implementation nuance, later on, we can also afford to have request buffered so that server failure can be detected and be cached in temp location and uploaded back through `imageproc`, that's why the mysql request is made first. Also if a database is down having file write request is redundant. 
 
 * The level of parallelism for `imageproc` is dependent on the machine it's running on, as the application scale based on the number of CPU if configured accordingly. The `api` application can also create a pool of socket to all the subprocess of imageproc allowing for equal distribution of request. Although the implementation cycles between the sockets every .5s.
 
 
-* Current the images are store in the disk itself. But it's not scalable. The best solution would be to have the storage being delegated to a S3 bucket. Not only that , a two step request can allow the frontend appplication to directly upload images to s3 with a s3 provided link. A sepparate Spark workflow can then be even kept for processing the uploaded images. Which will offload the compute heavy task from nodejs.
+* Currently the images are store in the disk itself. But it's not scalable. The best solution would be to have the storage being delegated to a S3 bucket. Not only that , a two step request can allow the frontend appplication to directly upload images to s3 with a s3 provided link. A sepparate Spark workflow can then be even kept for processing the uploaded images. Which will offload the compute heavy task from nodejs.
 
 * Currently upload process loads image file in memory and ofloads them to imageproc. This can be circumvented by usage of the above mentioned s3 storage or if implemented a one time jwt token system for the `imageproc` , allowing for upload of file binary and metadata to be sepparate from each other.   
 

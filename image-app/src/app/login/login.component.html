@@ -5,7 +5,8 @@
         <input type="password"  #password="ngModel"  [(ngModel)]="user.password" name="password" required    placeholder="Password">
         <span style="color: red;" *ngIf="password.touched && password.invalid"  >Invalid Password</span>
         <br>
-        <span style="color: red;" *ngIf="badPass"></span>
+        <span style="color: red;" *ngIf="badPass">Wrong username/password</span>
+        <br>
         <button type="submit" [disabled]="(password.touched && password.invalid) || (username.touched && username.invalid)" >Login</button>
     </form>
 </div>

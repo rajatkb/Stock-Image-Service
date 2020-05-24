@@ -39,7 +39,7 @@ export class UploadService{
             return {
                 tag:v
             }
-        }).concat(this.imageHashTag.getHashTags().map(v => {
+        }).concat((await this.imageHashTag.getHashTags()).map(v => {
             return {
                 tag:v
             }

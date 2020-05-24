@@ -33,9 +33,14 @@ export class ImageHashTags{
         }
         return a;
     }
-    getHashTags(){
+    async getHashTags():Promise<string[]>{
         const count = Math.floor(Math.random() * (5))
         const a = this.shuffle(this.hashtags)
-        return a.slice(0 , count)
+        return new Promise((resolve , reject) => {
+            const time = setTimeout(() => {
+                resolve(a.slice(0 , count))
+                clearTimeout(time)
+            }, 5000)
+        }) 
     }
 }

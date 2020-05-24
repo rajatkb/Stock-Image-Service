@@ -20,10 +20,6 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  print(ev){
-    console.log(ev)
-  }
-
   public badPass = false;
   async submitHandler(){
     const resp = await this.authService.login(this.user.username , this.user.password )
