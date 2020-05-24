@@ -46,7 +46,7 @@ export class LoginController extends BaseHttpController {
                 if(user === undefined || password === undefined)
                     throw new AuthenticationError(`Cannot authentciate bad credentials`)
                 else{
-                    if(password !== this.password && user != "admin")
+                    if(password !== this.password || user !== "admin")
                         throw new AuthenticationError(`Cannot authentcate , wrong password for user`)
                     else{
 

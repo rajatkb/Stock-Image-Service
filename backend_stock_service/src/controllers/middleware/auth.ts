@@ -80,6 +80,8 @@ export class AuthMiddleWare extends BaseMiddleware{
         res: Response,
         next: NextFunction
     ){
+
+        console.log(this.httpContext.user)
         let authenticated  = await this.httpContext.user.isAuthenticated()
         if(authenticated)
             next()
