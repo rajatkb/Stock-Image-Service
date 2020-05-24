@@ -144,7 +144,7 @@ export class QueryBuilder {
                 if(res[1].length !== 0)
                     return res[1]
             }
-            else(res[2] !== undefined)
+            else if (res[2] !== undefined)
             {
                 if(res[2].length !== 0)
                     return res[2]
