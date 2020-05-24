@@ -1,4 +1,4 @@
-# Stock-Image-Service
+# Stock-Image-Service 📱
 It's an application to store stock images and the ability to search and view the images, based on queries,
 
 The application built with three primary services
@@ -6,12 +6,12 @@ The application built with three primary services
 2. ImageProc Server (It's a standalone server responsible for storing image data and process it before storing)
 3. API Server (it exposes the API and also interfaces with the database and the ImageProc server)
 
-## Requirement (Dev or Build)
+## Requirement (Dev or Build) 🛠
 
 * Nodejs v12+
 * Angular 8+ with latest cli installed 
 
-## Build
+## Build 🔧
 
 ### Backend
 ```
@@ -27,7 +27,7 @@ or
 >> ng build
 ```
 
-## Deployment
+## Deployment ☁
 
 ```
 >> cd backend_stock_service
@@ -46,7 +46,7 @@ or
 * The application also requires an ssh pem key file with the supplied name of `keys.pem` and `keys`. These files should ideally be deleted from the server after deployment.
 
 
-#### Deployment Strategy
+#### Deployment Strategy 💭
 
 * The api and imageproc applications are written for utilising the cluster module to distribute the task. Although API module does not do much CPU intensive task except maintaining/searching an in-memory cache inside it , the `imageproc` process can hugely benefit from clustered deployment.
 
@@ -61,7 +61,7 @@ or
 * The image proc can further be deployed in more virtual machines (if deployed in cloud) with a load balancer in front of the cluster to redirect and rebalance request.
 
 
-## Decisions for development
+## Decisions for development 🛣
 
 * The application uses MySQL for storage and also as an indexing service for search functionality. To do away with manual SQL statements and overlooking security , I opted for using an ORM. I used `sequelize` which fits the requirement really well.
 
@@ -84,7 +84,7 @@ or
 
 ## Features 
 
-### Upload
+### Upload 👆
 
 <img src="upload.gif">
 
@@ -108,7 +108,7 @@ This process however in my view holds two issues.
 1. For multiple files it may lead to overhead of extra request for each file. Can be solved if multiple file metadata is coalasced as one, request.
 2. If implemented in such disentangled manner , failure of upload to s3 would have to be sepparately detected so that redudant uploaded data does not keep laying around in mysql db.
 
-### Search
+### Search 🔍
 
 
 <img src="search.gif"/>
@@ -135,7 +135,7 @@ Which organises all this for query through sequelize.
 
 
 
-## Image Processing
+## Image Processing 🧗‍♀️
 
 * The image processing server is implemented using the `ws` package along with `Rxjs` for managing socket connections. Earlier I started with `net` package , as I thought a IPC over fifo files would be more efficient but it would also restrict the image processing to the same system where the api application lays.
 
@@ -145,7 +145,7 @@ Which organises all this for query through sequelize.
 
 * The Image is processed by `Sharp` library as mentioned before and is reasonably fast and easy to use. I have been able to upload simultaneous 16+ images in my system with i7 4770 4th gen , 3.7Ghz 4 core - 8threads / 16GB RAM system
 
-## API Performance
+## API Performance 👌
 
 * The `Api` application in itself is not doing much CPU intensive computation except regex parsing. I have tried using worker threads but the cost of serialization + regex + deserialization in itself is greater and doesn't give any benefits.
 
@@ -173,7 +173,7 @@ The performance is better for lesser concurrency and higher LIBUV_THREADPOOL cou
 
 Req/Bytes counts sampled once per second.
 
-## Resilience 
+## Resilience 🥦
 
 * The application `api` and `imageproc` are separate. The `api` when started tries to connect to the api automatically. If the service of `imageproc` fails. Even then the `api` quickly tries to recreate the connection.
 
