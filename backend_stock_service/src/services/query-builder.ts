@@ -151,28 +151,24 @@ export class QueryBuilder {
         }       
     }
 
-    public async parseQuery(query:string):Promise<Query>{
-        
-        return new Promise<Query>((resolve , reject) => {
-            query = " "+query+" "
-            this.logger.debug(`query parser called`)
-            let response:Query = {};
-            response.tags = this.parseTags(query)
-            const date = this.parseDate(query)
-            response.dateTime = date == undefined ? this.parseFromTo(query) : date 
-            response.desc = this.parseDescription(query)
+    public parseQuery(query:string){
 
-            resolve(response)
+        if(query.length > 10000){
+            this.logger.warn(`Extremely long query has been send for parsing !!`)
+            return {}
+        }
+            
+        query = " "+query+" "
+        this.logger.debug(`query parser called`)
+        let response:Query = {};
+            
+            
+        response.tags = this.parseTags(query)
+        const date = this.parseDate(query)
+        response.dateTime = date == undefined ? this.parseFromTo(query) : date 
+        response.desc = this.parseDescription(query)
 
-            const timeout = setTimeout(() => {
-                reject(new Error(`Took to much time to parse query`))
-                clearTimeout(timeout)
-            } , 5000)
-        })
-        
-        
-        
-        
+        return response
     }
 
     public parseHashTags = (desc:string) => {

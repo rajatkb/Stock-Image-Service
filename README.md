@@ -96,6 +96,16 @@ or
 
 * The level of parallelism for `imageproc` is dependent on the machine it's running on, as the application scale based on the number of CPU if configured accordingly. The `api` application can also create a pool of socket to all the subprocess of imageproc allowing for equal distribution of request. Although the implementation cycles between the sockets every .5s.
 
+
+* Current the images are store in the disk itself. But it's not scalable. The best solution would be to have the storage being delegated to a S3 bucket. Not only that , a two step request can allow the frontend appplication to directly upload images to s3 with a s3 provided link. A sepparate Spark workflow can then be even kept for processing the uploaded images. Which will offload the compute heavy task from nodejs.
+
+* Currently upload process loads image file in memory and ofloads them to imageproc. This can be circumvented by usage of the above mentioned s3 storage or if implemented a one time jwt token system for the `imageproc` , allowing for upload of file binary and metadata to be sepparate from each other.   
+
+This process however in my view holds two issues.
+
+1. For multiple files it may lead to overhead of extra request for each file. Can be solved if multiple file metadata is coalasced as one, request.
+2. If implemented in such disentangled manner , failure of upload to s3 would have to be sepparately detected so that redudant uploaded data does not keep laying around in mysql db.
+
 ### Search
 
 
@@ -103,7 +113,9 @@ or
 
 * User can search through description , tags and date range. These queries are exclusive i.e and-ed together except tags. Tags are or-ed. 
 
-* Queries provided here are run through some regex expression to find matches. From a security perspective this can open up a window for regex-based dos attack. For safeguarding against that, the regex evaluation is contained inside promises which will timeout if it takes too long for evaluation.
+* Queries provided here are run through some regex expression to find matches. From a security perspective this can open up a window for regex-based dos attack. Current implementation does a manual check of 10,000 character limit for query. So that large text query does not breaks the search functionality.
+
+*Solution*: Use a threadpool where tasks can be timedout, although this will be a more time taking solution to build but current there are no good acceptable workerpool implementation. There is one called `workerpool` , but apparently for some reason the communication overheard between main process and workerthreads in it makes using it quite redundant. So if an implementation is created for the same with some pre-caching for avoiding repeated serialization of functions (which I suspect is the bottleneck) Regex can safely be accepted with no artificial limit of 10,000 characters.
 
 * After the required data regarding description, date range and tags are extracted it is passed to the `File` model class.
 Which organises all this for query through sequelize. 
@@ -126,7 +138,7 @@ Which organises all this for query through sequelize.
 
 * The file id is a fixed unique UUID or 36 bytes , so the file id and the files are concatenated in binary array and passed through socket at once, and are unmarshalled at the other end. For more complex data , Protobuf should be an explorable option. But since only these two data were sufficient I did not explore any other serialization.
 
-* The Image is processed by `Sharp` library as mentioned before and is reasonably fast and easy to use. I have been able to upload simultaneous 16+ images in my home system with i7 4770 4th gen , 3.7Ghz 4 core - 8threads system. 
+* The Image is processed by `Sharp` library as mentioned before and is reasonably fast and easy to use. I have been able to upload simultaneous 16+ images in my system with i7 4770 4th gen , 3.7Ghz 4 core - 8threads / 16GB RAM system
 
 ## API Performance
 

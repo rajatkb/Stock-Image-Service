@@ -19,7 +19,7 @@ export class SearchService {
             if(query.length == 0)
                 res = await this.fileOps.getOffsetNFiles(limit , offset)
             else{
-                const querydata = await this.queryBuilder.parseQuery(query)
+                const querydata = this.queryBuilder.parseQuery(query)
                 res = await this.fileOps.findFileByQueryAnd(querydata , limit , offset)
             }
             res.forEach( r => {
