@@ -39,6 +39,14 @@ let nump = Number.parseInt(process.env.API_PROCESS_COUNT)
 if(process.env.SERVER_PORT === undefined)
     throw new UndefinedEnvironmentVariable("process.env.SERVER_PORT : undefined in .env")
 
+// DONE FOR ONLY DEPLOYMENT PURPOSE IN SMALLER SYSTEM WITH LOW RAM
+// IDEALLY USE filserver.js or nginx
+if(process.env.STORAGE_LOCATION === undefined )
+    throw new UndefinedEnvironmentVariable(`STORAGE_LOCATION not defined`)
+
+
+if(process.env.APPLICATION_LOCATION === undefined )
+    throw new UndefinedEnvironmentVariable(`APPLICATION_LOCATION not defined`)
 
 if(cluster.isMaster){
     for(let i = 0 ; i < nump  ; i++){
@@ -55,8 +63,13 @@ if(cluster.isMaster){
 
     const database = container.get(Database)
     
+    const application = process.env.APPLICATION_LOCATION
+    const uploads = process.env.STORAGE_LOCATION
+
     const eapp = express()
     eapp.use(cors())
+    eapp.use('/uploads', express.static(uploads))
+    eapp.use(express.static(application))
 
     const server = new InversifyExpressServer(container , null ,null , eapp , CustomAuthProvider)
 
