@@ -37,7 +37,7 @@ export class QueryBuilder {
     private getInitDate = (str:string) => {
         let begDate = new Date(str)
         let dat = begDate.getDate()
-        begDate.setHours(0, 0 , 0 , 0)
+        begDate.setUTCHours(0, 0 , 0 , 0)
         return begDate
     }
     

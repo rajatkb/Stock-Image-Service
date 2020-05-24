@@ -131,6 +131,9 @@ Which organises all this for query through sequelize.
 
 *Solution* : The problem with MySQL lacks such word preprocessing can be solved from the application end. A sepparate description preprocessor can create comma-separated root word collection which then can be used for Full text index and be queried using boolean queries. (TF-IDF is used by MySQL). This will yield results as we may get from Postgres. 
 
+* Another thing to note is MYSQL does supports stop word removal , so words like 'this' 'is' 'are' may return empty results 
+
+
 
 ## Image Processing
 
