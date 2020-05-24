@@ -89,7 +89,6 @@ export class QueryBuilder {
                 if(begDate.toString() == 'Invalid Date')
                     throw new IllegalDateFormat(`Bad date format give (d , m , yyyy) : ${`${day}/${month}/${year}`}`)
                 let endDate = new Date(begDate.getTime() + 24*60*60*1000)
-                console.log([begDate , endDate])
                 return [begDate , endDate]
             }else if(datePatRes[4] !== undefined){
                 // single year mode date:2016
@@ -138,7 +137,7 @@ export class QueryBuilder {
     private parseDescription(query:string):string | undefined{
         
         const res = this.descPat.exec(query)
-        console.log(query , res)
+
         if(res !== null){
             if(res[1] !== undefined ){
                 if(res[1].length !== 0)

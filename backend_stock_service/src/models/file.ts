@@ -197,8 +197,6 @@ export class FileOpsModel {
      * @param offset 
      */
     async findFileByQueryAnd(query: Query , limit:number , offset:number):Promise<FileS[]> {
-        
-        console.log(query)
 
         const [fwhere,hwhere,fhwhere , searchOrder] = this.buildQuery(query) 
         
