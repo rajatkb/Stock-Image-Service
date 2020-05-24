@@ -88,7 +88,7 @@ export class QueryBuilder {
                 let begDate = this.getInitDate(`${month}/${day}/${year}`)
                 if(begDate.toString() == 'Invalid Date')
                     throw new IllegalDateFormat(`Bad date format give (d , m , yyyy) : ${`${day}/${month}/${year}`}`)
-                let endDate = new Date(begDate.getTime() + 24*60*60*1000)
+                let endDate = new Date(begDate.getTime() + 36*60*60*1000)
                 
                 return [begDate , endDate]
             }else if(datePatRes[4] !== undefined){
