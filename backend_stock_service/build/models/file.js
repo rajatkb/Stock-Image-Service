@@ -113,7 +113,7 @@ let FileOpsModel = class FileOpsModel {
             hwhere = {
                 tag: query.tags
             };
-        if (query.dateTime !== undefined)
+        if (query.dateTime !== undefined) {
             if (query.dateTime.length == 2) {
                 if (query.dateTime[0] == undefined && query.dateTime[1] == undefined)
                     fhwhere = undefined;
@@ -129,6 +129,19 @@ let FileOpsModel = class FileOpsModel {
                             [sequelize_1.Op.gte]: query.dateTime[0]
                         }
                     };
+                else if (query.dateTime[0] !== undefined && query.dateTime[1] !== undefined)
+                    fhwhere = {
+                        createdAt: {
+                            [sequelize_1.Op.and]: [
+                                {
+                                    [sequelize_1.Op.gte]: query.dateTime[0]
+                                },
+                                {
+                                    [sequelize_1.Op.lte]: query.dateTime[1]
+                                }
+                            ]
+                        }
+                    };
             }
             else if (query.dateTime.length == 3) {
                 const arr = ["day", "month", "year"];
@@ -139,6 +152,7 @@ let FileOpsModel = class FileOpsModel {
                         };
                 }));
             }
+        }
         const searchOrder = query.desc !== undefined && query.desc !== "" ?
             undefined : [['createdAt', 'DESC']];
         return [fwhere, hwhere, fhwhere, searchOrder];

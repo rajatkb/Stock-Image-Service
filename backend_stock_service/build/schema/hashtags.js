@@ -15,6 +15,7 @@ const HashTagsSchema = (sequelize) => {
             type: sequelize_1.DataTypes.CHAR(100),
             unique: true,
             allowNull: false,
+            primaryKey: true
         },
     }, {
         sequelize,

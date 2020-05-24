@@ -38,6 +38,12 @@ if (process.env.API_PROCESS_COUNT === undefined)
 let nump = Number.parseInt(process.env.API_PROCESS_COUNT);
 if (process.env.SERVER_PORT === undefined)
     throw new server_1.UndefinedEnvironmentVariable("process.env.SERVER_PORT : undefined in .env");
+// DONE FOR ONLY DEPLOYMENT PURPOSE IN SMALLER SYSTEM WITH LOW RAM
+// IDEALLY USE filserver.js or nginx
+if (process.env.STORAGE_LOCATION === undefined)
+    throw new server_1.UndefinedEnvironmentVariable(`STORAGE_LOCATION not defined`);
+if (process.env.APPLICATION_LOCATION === undefined)
+    throw new server_1.UndefinedEnvironmentVariable(`APPLICATION_LOCATION not defined`);
 if (cluster_1.default.isMaster) {
     for (let i = 0; i < nump; i++) {
         setTimeout(() => {
@@ -50,8 +56,12 @@ else {
     const logger = new logger_1.Logger('api').getLogger();
     logger.info(`App starting !!`);
     const database = api_config_1.container.get(database_1.Database);
+    const application = process.env.APPLICATION_LOCATION;
+    const uploads = process.env.STORAGE_LOCATION;
     const eapp = express_1.default();
     eapp.use(cors_1.default());
+    eapp.use('/uploads', express_1.default.static(uploads));
+    eapp.use(express_1.default.static(application));
     const server = new inversify_express_utils_1.InversifyExpressServer(api_config_1.container, null, null, eapp, auth_1.CustomAuthProvider);
     server.setConfig((app) => {
         // disabled compression control calculations

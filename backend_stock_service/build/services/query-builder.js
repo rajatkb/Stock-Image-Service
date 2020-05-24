@@ -27,7 +27,8 @@ let QueryBuilder = class QueryBuilder {
         this.timeout = Number.parseInt(config_1.default.get('QueryBuilder.timeout')) * 1000;
         this.getInitDate = (str) => {
             let begDate = new Date(str);
-            begDate.setUTCHours(0, 0, 0, 0);
+            let dat = begDate.getDate();
+            begDate.setHours(0, 0, 0, 0);
             return begDate;
         };
         this.parseHashTags = (desc) => {
@@ -88,6 +89,7 @@ let QueryBuilder = class QueryBuilder {
                 if (begDate.toString() == 'Invalid Date')
                     throw new query_1.IllegalDateFormat(`Bad date format give (d , m , yyyy) : ${`${day}/${month}/${year}`}`);
                 let endDate = new Date(begDate.getTime() + 24 * 60 * 60 * 1000);
+                console.log([begDate, endDate]);
                 return [begDate, endDate];
             }
             else if (datePatRes[4] !== undefined) {
@@ -146,6 +148,10 @@ let QueryBuilder = class QueryBuilder {
         }
     }
     parseQuery(query) {
+        if (query.length > 10000) {
+            this.logger.warn(`Extremely long query has been send for parsing !!`);
+            return {};
+        }
         query = " " + query + " ";
         this.logger.debug(`query parser called`);
         let response = {};
