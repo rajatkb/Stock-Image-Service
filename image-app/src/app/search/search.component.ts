@@ -16,7 +16,7 @@ export class SearchComponent implements OnInit , OnDestroy{
     ) { }
   
   public query:string=""
-  public limit:number = 2;
+  public limit:number = 5;
   public uploads$:Observable<FileS[]> = this.searchService.getSearchResults()
                                         .pipe(
                                           tap(() => {
