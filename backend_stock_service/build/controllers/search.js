@@ -40,7 +40,7 @@ let SearchController = class SearchController extends inversify_express_utils_1.
                 throw new Error(`Bad request recieved from ip : ${request.ip}`);
             const data = await this.searchService.queryByString(query, nlimit, noffset);
             const key = query + "|" + limit + "|" + offset;
-            const ttl = this.ttl - Math.floor((noffset + 1) / (nlimit + 1));
+            const ttl = this.ttl * (Math.floor((noffset + 1) / (nlimit + 1)) + 1);
             this.cache.set(key, data, ttl);
             response.status(200).json({
                 status: 200,

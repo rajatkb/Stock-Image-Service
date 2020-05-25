@@ -18,7 +18,7 @@ export class UploadService {
     let progress = 0;
     return (ev:HttpEvent<Object>) => {
       if(ev.type == HttpEventType.UploadProgress){
-        progress+=(ev.loaded/(ev.total * length)) * 100 - (length * 2)
+        progress+=(ev.loaded/(ev.total * length)) * 100
         let resp:UploadStatus = {
           percentage:progress,
           uploadData: undefined,

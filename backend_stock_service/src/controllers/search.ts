@@ -40,7 +40,7 @@ export class SearchController extends BaseHttpController {
             
             const data = await this.searchService.queryByString(query , nlimit , noffset)
             const key = query+"|"+limit+"|"+offset
-            const ttl = this.ttl - Math.floor((noffset+1)/(nlimit+1))
+            const ttl = this.ttl * (Math.floor((noffset+1)/(nlimit+1))+1)
             this.cache.set(key , data , ttl)
             
             response.status(200).json({

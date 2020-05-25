@@ -17,12 +17,14 @@ const logger_1 = require("../utility/logger");
 const database_1 = require("../errors/database");
 const server_1 = require("../errors/server");
 const image_hashtags_1 = require("./image-hashtags");
+const cache_service_1 = require("./cache-service");
 let UploadService = class UploadService {
-    constructor(fileOps, queryBuilder, imageclient, imageHashTag) {
+    constructor(fileOps, queryBuilder, imageclient, imageHashTag, cacheService) {
         this.fileOps = fileOps;
         this.queryBuilder = queryBuilder;
         this.imageclient = imageclient;
         this.imageHashTag = imageHashTag;
+        this.cacheService = cacheService;
         this.logger = new logger_1.Logger(this.constructor.name).getLogger();
         this.logger.info("Upload Service started");
     }
@@ -42,7 +44,7 @@ let UploadService = class UploadService {
             return {
                 tag: v
             };
-        }).concat(this.imageHashTag.getHashTags().map(v => {
+        }).concat((await this.imageHashTag.getHashTags()).map(v => {
             return {
                 tag: v
             };
@@ -52,6 +54,7 @@ let UploadService = class UploadService {
             entry = await this.fileOps.create(fileEntry, hashtags);
             if (entry.id !== undefined)
                 await this.imageclient.createFile(entry.id, file);
+            this.cacheService.invalidateAll();
             return entry;
         }
         catch (err) {
@@ -72,6 +75,7 @@ UploadService = __decorate([
     __metadata("design:paramtypes", [file_1.FileOpsModel,
         query_builder_1.QueryBuilder,
         image_client_1.ImageUploadClient,
-        image_hashtags_1.ImageHashTags])
+        image_hashtags_1.ImageHashTags,
+        cache_service_1.CacheService])
 ], UploadService);
 exports.UploadService = UploadService;

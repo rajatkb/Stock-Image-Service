@@ -42,7 +42,7 @@ let LoginController = class LoginController extends inversify_express_utils_1.Ba
             if (user === undefined || password === undefined)
                 throw new server_1.AuthenticationError(`Cannot authentciate bad credentials`);
             else {
-                if (password !== this.password && user != "admin")
+                if (password !== this.password || user !== "admin")
                     throw new server_1.AuthenticationError(`Cannot authentcate , wrong password for user`);
                 else {
                     let cpkey = this.cacheService.get('pemfile');

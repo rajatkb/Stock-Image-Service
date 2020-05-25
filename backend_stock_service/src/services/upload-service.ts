@@ -10,6 +10,7 @@ import { ImageUploadError, UploadError } from "../errors/server";
 
 import { File} from '../utility/File'
 import { ImageHashTags } from "./image-hashtags";
+import { CacheService } from "./cache-service";
 
 @injectable()
 export class UploadService{
@@ -18,7 +19,8 @@ export class UploadService{
     constructor(private fileOps:FileOpsModel , 
                 private queryBuilder:QueryBuilder , 
                 private imageclient:ImageUploadClient,
-                private imageHashTag:ImageHashTags){
+                private imageHashTag:ImageHashTags,
+                private cacheService:CacheService<any>){
         this.logger.info("Upload Service started")
     }
 
@@ -52,6 +54,7 @@ export class UploadService{
             entry = await this.fileOps.create(fileEntry , hashtags)
             if(entry.id !== undefined)
                 await this.imageclient.createFile(entry.id , file)
+            this.cacheService.invalidateAll()
             return entry
         }catch(err){
             if( err instanceof FileEntryCreationError )

@@ -23,6 +23,9 @@ let CacheService = class CacheService {
     get(key) {
         return this.nodecache.get(key);
     }
+    invalidateAll() {
+        this.nodecache.flushAll();
+    }
 };
 CacheService = __decorate([
     inversify_1.injectable()

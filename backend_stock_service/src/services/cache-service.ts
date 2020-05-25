@@ -14,4 +14,8 @@ export class CacheService<T>{
     public get(key:string):T{
         return this.nodecache.get(key) as T
     }
+
+    public invalidateAll():void{
+        this.nodecache.flushAll()
+    }
 }
