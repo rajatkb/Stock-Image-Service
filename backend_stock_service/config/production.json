@@ -6,7 +6,7 @@
         "requestTimeout":5
     },
     "SearchController":{
-        "ttl":3
+        "ttl":10
     },
     "CacheService":{
         "ttl":100
