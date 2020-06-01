@@ -4,7 +4,7 @@
             <p class="search__title">
                 Search For Images 
             </p>
-            <input [(ngModel)]="query" class="search__input" type="text" placeholder="Search" (keyup.enter)="searchEnter($event)">
+            <input [(ngModel)]="query" value="" class="search__input" type="text" placeholder="Search" (keyup.enter)="searchEnter($event)">
             <br>
             <br>
             <span>Scroll for more results , Format: "desc:"Berlin wall" date:20-*-2016 tags:cute,dog ". Use slider to change limit. Current limit :{{ limit }}</span>
