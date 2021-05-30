@@ -38,7 +38,7 @@
     "sharp": "^0.25.2",
     "winston": "^3.2.1",
     "workerpool": "^6.0.0",
-    "ws": "^7.3.0"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
