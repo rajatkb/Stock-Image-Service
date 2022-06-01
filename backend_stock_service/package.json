@@ -35,7 +35,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.4",
     "sequelize": "^5.21.7",
-    "sharp": "^0.25.2",
+    "sharp": "^0.30.5",
     "winston": "^3.2.1",
     "workerpool": "^6.0.0",
     "ws": "^7.3.0"
